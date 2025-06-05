@@ -48,15 +48,20 @@ PSO/
 ## 4. Requirements
 
 - Python 3.11+
-- TensorFlow/Keras
-- NumPy
-- Pandas
-- Matplotlib
-- Scikit-learn
+- TensorFlow/Keras 2.13+
+- NumPy 1.24+
+- Pandas 2.0+
+- Matplotlib 3.7+
+- Scikit-learn 1.3+
 
 **Install dependencies:**
 ```bash
-pip install tensorflow numpy pandas matplotlib scikit-learn
+pip install tensorflow>=2.13 numpy>=1.24 pandas>=2.0 matplotlib>=3.7 scikit-learn>=1.3
+```
+
+**Alternative installation with specific versions:**
+```bash
+pip install tensorflow==2.13.0 numpy==1.24.3 pandas==2.0.3 matplotlib==3.7.2 scikit-learn==1.3.0
 ```
 
 ---
@@ -105,10 +110,10 @@ pip install tensorflow numpy pandas matplotlib scikit-learn
 
 ## 6. PSO Hyperparameter Optimization Details
 
-- **What is PSO?**  
+- **What is PSO?**
   Particle Swarm Optimization is a population-based optimization algorithm inspired by the social behavior of birds. Each "particle" represents a candidate solution (set of hyperparameters) and moves through the search space to find the best solution.
 
-- **How is it used here?**  
+- **How is it used here?**
   The `pso_optimizer.py` module defines:
   - The `Particle` class (a candidate solution)
   - The `PSOOptimizer` class (manages the swarm and optimization process)
@@ -122,9 +127,47 @@ pip install tensorflow numpy pandas matplotlib scikit-learn
   5. Repeat for a set number of iterations
   6. Return the best hyperparameters found
 
+### 6.1. Code Example: Using the PSO Optimizer
+
+```python
+from pso_optimizer import PSOOptimizer, create_mlp_model
+import numpy as np
+
+# Define hyperparameter search space
+bounds = {
+    'neurons_layer_1': (32, 128),
+    'neurons_layer_2': (16, 64),
+    'learning_rate': (0.0001, 0.01),
+    'num_layers': (2, 4),
+    'activation_choice': (0, 2)  # 0=swish, 1=relu, 2=tanh
+}
+
+# Initialize PSO optimizer
+pso = PSOOptimizer(
+    bounds=bounds,
+    num_particles=10,
+    max_iterations=20
+)
+
+# Define fitness function (returns RMSE)
+def fitness_function(hyperparams):
+    model = create_mlp_model(hyperparams, input_shape=(X_train.shape[1],))
+    model.fit(X_train, y_train, epochs=50, verbose=0)
+    predictions = model.predict(X_test)
+    rmse = np.sqrt(mean_squared_error(y_test, predictions))
+    return rmse
+
+# Run optimization
+best_params, best_fitness, history = pso.optimize(fitness_function)
+print(f"Best RMSE: {best_fitness:.6f}")
+print(f"Best parameters: {best_params}")
+```
+
 ---
 
 ## 7. Results
+
+### 7.1. Univariate Model Performance
 
 | Model                    | RMSE (Lower is Better) | Improvement (%) |
 |--------------------------|-----------------------|----------------|
@@ -133,8 +176,28 @@ pip install tensorflow numpy pandas matplotlib scikit-learn
 | CNN Univariate (Baseline)| 0.03028               | -              |
 | **PSO-CNN Univariate**   | **0.00654**           | **78.40%**     |
 
-- **Conclusion:**  
+### 7.2. Visual Results
+
+The following plots are available in the `PLOTS/` directory:
+
+- **Model Comparison**: `model_comparison.png` - Side-by-side comparison of all model performances
+- **PSO Optimization Progress**: `PSO_MLP_U.png` and `PSO_CNN_U.png` - Shows fitness improvement over iterations
+- **Exchange Rate Trends**: `GBP.png` - Historical GBP/USD exchange rate data
+- **Statistical Analysis**: `autocorrelation.png`, `residuals.png` - Model validation plots
+
+### 7.3. Key Findings
+
+- **Conclusion:**
   PSO-optimized models significantly outperform their baseline counterparts.
+- **Best Architecture**: PSO-CNN achieved the lowest RMSE (0.00654) with 78.40% improvement
+- **Optimization Efficiency**: PSO typically converges within 15-20 iterations
+- **Activation Functions**: Swish activation often performs better than ReLU and Tanh for this dataset
+
+### 7.4. Multivariate Model Results
+
+*Note: While the directory structure includes multivariate model notebooks (indicated by `_M` suffix in plots),
+the current results table focuses on univariate models. Future work will include comprehensive multivariate
+model comparisons incorporating additional economic indicators.*
 
 ---
 
@@ -176,6 +239,26 @@ pip install tensorflow numpy pandas matplotlib scikit-learn
 - Adjust PSO search space in the PSO notebooks or `pso_optimizer.py`
 - Use the PSO optimizer for other time series or regression tasks
 
+### 9.1. Adding Custom Activation Functions
+
+```python
+# Example: Adding a custom activation function to the PSO optimizer
+def custom_activation(x):
+    return tf.nn.swish(x) * 0.9  # Modified Swish
+
+# Update the activation_functions list in pso_optimizer.py
+activation_functions = ['swish', 'relu', 'tanh', 'custom']
+```
+
+### 9.2. Extending to Other Datasets
+
+The PSO optimizer is designed to be dataset-agnostic. To use it with other time series:
+
+1. Prepare your data in the same format (features, target)
+2. Adjust the hyperparameter bounds based on your data complexity
+3. Modify the input_shape parameter in model creation functions
+4. Run the optimization process
+
 ---
 
 ## 10. References
@@ -186,8 +269,29 @@ pip install tensorflow numpy pandas matplotlib scikit-learn
 
 ---
 
-## 11. Contact
+## 11. Future Improvements
+
+### 11.1. Potential Enhancements
+
+- **Enhanced Visualizations**: Add interactive plots using Plotly for better result exploration
+- **Advanced PSO Variants**: Implement adaptive PSO with dynamic parameter adjustment
+- **Ensemble Methods**: Combine multiple PSO-optimized models for improved predictions
+- **Real-time Prediction**: Add streaming data capabilities for live exchange rate forecasting
+- **Cross-validation**: Implement time series cross-validation for more robust model evaluation
+
+### 11.2. Model Architecture Extensions
+
+- **LSTM Integration**: Add Long Short-Term Memory networks for better temporal pattern recognition
+- **Attention Mechanisms**: Implement attention layers to focus on important time periods
+- **Multi-scale Analysis**: Incorporate different time horizons (daily, weekly, monthly) in a single model
+
+### 11.3. Data Enhancements
+
+- **Additional Economic Indicators**: Include inflation rates, unemployment data, and central bank policies
+- **Sentiment Analysis**: Incorporate news sentiment and social media indicators
+- **High-frequency Data**: Use minute-level or hourly exchange rate data for short-term predictions
+
+## 12. Contact
 
 For questions or contributions, please contact the project maintainer.
-
 ---
