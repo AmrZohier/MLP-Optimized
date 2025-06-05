@@ -269,28 +269,6 @@ The PSO optimizer is designed to be dataset-agnostic. To use it with other time 
 
 ---
 
-## 11. Future Improvements
-
-### 11.1. Potential Enhancements
-
-- **Enhanced Visualizations**: Add interactive plots using Plotly for better result exploration
-- **Advanced PSO Variants**: Implement adaptive PSO with dynamic parameter adjustment
-- **Ensemble Methods**: Combine multiple PSO-optimized models for improved predictions
-- **Real-time Prediction**: Add streaming data capabilities for live exchange rate forecasting
-- **Cross-validation**: Implement time series cross-validation for more robust model evaluation
-
-### 11.2. Model Architecture Extensions
-
-- **LSTM Integration**: Add Long Short-Term Memory networks for better temporal pattern recognition
-- **Attention Mechanisms**: Implement attention layers to focus on important time periods
-- **Multi-scale Analysis**: Incorporate different time horizons (daily, weekly, monthly) in a single model
-
-### 11.3. Data Enhancements
-
-- **Additional Economic Indicators**: Include inflation rates, unemployment data, and central bank policies
-- **Sentiment Analysis**: Incorporate news sentiment and social media indicators
-- **High-frequency Data**: Use minute-level or hourly exchange rate data for short-term predictions
-
 ## 12. Contact
 
 For questions or contributions, please contact the project maintainer.
